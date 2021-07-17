@@ -15,7 +15,6 @@ def find_max_page(url):
 
 if __name__ == "__main__":
     #driver = webdriver.Chrome()
-    # 페이지 접속
     #driver.get('http://www.lampcook.com/farm/food_farm_list.php')
 
     # 1~12월 농산물 크롤링
