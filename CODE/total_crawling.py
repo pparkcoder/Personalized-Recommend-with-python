@@ -9,7 +9,6 @@ def foodnuri_find_max_page(url):
     page = str(soup.select('.i.end.disabled > a[href]')).split()
     return int(page[2][len(page[2]) - 2])
 
-
 def lampcook_find_max_page(url):
     html = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(html, 'html.parser')
@@ -18,7 +17,6 @@ def lampcook_find_max_page(url):
         return int(page[0].attrs['href'][33:])
     else:
         return 1
-
 
 if __name__ == "__main__":
 
