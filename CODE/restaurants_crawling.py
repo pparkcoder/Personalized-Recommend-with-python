@@ -40,14 +40,14 @@ if __name__ == "__main__":
                 pass
 
         cnt = driver.find_elements_by_css_selector('.blink') # 총 식당 개수
-        result = [] # 식당 링크 수집
+        result = [] # 식당 링크 리스트
 
-        print(search_data[k]+'식당 링크 수집중..')
+        print(search_data[k]+'관련 식당 링크 수집중..')
         for i in range(len(cnt)):
             temp =cnt[i].get_attribute('href')
             if "/profile.php?rid=" in temp:
                 result.append(temp)
-        print('식당 링크 수집완료..')
+        print('링크 수집완료..')
 
         driver.close()
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             number = re.sub('[^-. 0-9]', '', title).lstrip()
             temp.append(number)
 
-            title = str(soup.select('.s-list.appraisal > .tit')) #평가 인원
+            title = str(soup.select('.s-list.appraisal > .tit')) #리뷰 수
             reviewers = re.sub('[^0-9]', '', title).lstrip()
             temp.append(reviewers)
 
