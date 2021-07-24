@@ -39,7 +39,7 @@ if __name__ == "__main__":
             except:
                 pass
 
-        cnt = driver.find_elements_by_css_selector('.blink') # 총 식당 개수
+        cnt = driver.find_elements_by_css_selector('.blink') # 총 식당 개수, (cf : _blink는 새탭으로 열어라 라는 명시적 의미)
         result = [] # 식당 링크 리스트
 
         print(search_data[k]+'관련 식당 링크 수집중..')
