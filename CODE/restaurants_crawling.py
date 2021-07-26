@@ -93,7 +93,7 @@ if __name__ == "__main__":
             
             for j in range(len(review_cnt)):
                 title = review_cnt[j].find_element_by_css_selector('.date')
-                if '2020' in title.text:
+                if '2020' or '2021' in title.text:
                     temp.append(cnt[i].find_element_by_css_selector('.review_contents.btxt').text) #사용자가 작성한 리뷰
 
             total_data.append(temp)
