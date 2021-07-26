@@ -1,5 +1,6 @@
 # 상호 명, 주소, 전화번호, 리뷰 수, 평점, 사용자가 작성한 리뷰 크롤링
 
+import copy
 import time
 import re
 import csv
@@ -39,26 +40,28 @@ if __name__ == "__main__":
             except:
                 pass
 
-        cnt = driver.find_elements_by_css_selector('.blink') # 총 식당 개수, (cf : _blink는 새탭으로 열어라 라는 명시적 의미)
-        result = [] # 식당 링크 리스트
+        cnt = driver.find_elements_by_css_selector('.blink') # 총 식당 개수
+        result = [] # 식당 링크 수집
 
-        print(search_data[k]+'관련 식당 링크 수집중..')
+        print(search_data[k]+'식당 링크 수집중..')
         for i in range(len(cnt)):
             temp =cnt[i].get_attribute('href')
             if "/profile.php?rid=" in temp:
                 result.append(temp)
-        print('링크 수집완료..')
+        print('식당 링크 수집완료..')
 
         driver.close()
 
         total_data = []
 
         for i in range(len(result)) :
-            url = result[i]
-            html = urllib.request.urlopen(url).read()
+            temp_url = result[i]
+            html = urllib.request.urlopen(temp_url).read()
             soup = BeautifulSoup(html, 'html.parser')
             temp = []
+
             print(str(i + 1)+'번째 수집중..')
+
             title = str(soup.select('.tit-point > p[class]')) #상호 명
             name = re.sub('[^-. 0-9가-힣]', '', title).lstrip()
             temp.append(name)
@@ -71,7 +74,7 @@ if __name__ == "__main__":
             number = re.sub('[^-. 0-9]', '', title).lstrip()
             temp.append(number)
 
-            title = str(soup.select('.s-list.appraisal > .tit')) #리뷰 수
+            title = str(soup.select('.s-list.appraisal > .tit')) #평가 인원
             reviewers = re.sub('[^0-9]', '', title).lstrip()
             temp.append(reviewers)
 
@@ -79,8 +82,12 @@ if __name__ == "__main__":
             score = re.sub('[^.0-9]', '', title).lstrip()
             temp.append(score)
             
+            driver = webdriver.Chrome()
+            driver.get(temp_url)
+            temp_elem = driver.find_element_by_tag_name("body")
+
             for j in range(60):
-                elem.send_keys(Keys.PAGE_DOWN)
+                temp_elem.send_keys(Keys.PAGE_DOWN)
                 time.sleep(0.1)
                 try:
                     driver.find_element_by_xpath('//*[@id="div_more_review"]/span').click()  # 더보기 버튼 클릭
@@ -89,14 +96,22 @@ if __name__ == "__main__":
                 except:
                     pass
 
-            review_cnt = driver.find_elements_by_css_selector('.latter-graph')
-            
-            for j in range(len(review_cnt)):
-                title = review_cnt[j].find_element_by_css_selector('.date')
-                if '2020' or '2021' in title.text:
-                    temp.append(cnt[i].find_element_by_css_selector('.review_contents.btxt').text) #사용자가 작성한 리뷰
+            review_cnt = driver.find_elements_by_css_selector('.latter-graph') # 총 리뷰 개수
 
-            total_data.append(temp)
+            for j in range(len(review_cnt)):
+                date = review_cnt[j].find_element_by_css_selector('.date')
+
+                if ('2020' or '2021') in date.text:
+                    try:
+                        temp2 = temp.copy()
+                        temp2.append(review_cnt[j].find_element_by_css_selector('.review_contents.btxt').text) # 작성 리뷰
+                        temp2.append((review_cnt[j].find_element_by_css_selector('.point-detail').text)[1]) # 리뷰 평점
+                        temp2.append(date.text)
+                        total_data.append(temp2)
+                    except:
+                        pass
+                    
+            driver.close()
 
         with open(search_data[k]+'.csv', 'w', encoding='utf-8-sig', newline='') as f:
             csvWriter = csv.writer(f)
