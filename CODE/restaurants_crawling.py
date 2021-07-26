@@ -1,8 +1,10 @@
 # 상호 명, 주소, 전화번호, 리뷰 수, 평점, 사용자가 작성한 리뷰 크롤링
 
+# -*- coding: utf-8 -*-
 import copy
 import time
 import re
+import openpyxl
 import csv
 import urllib.request
 import urllib.parse
@@ -25,6 +27,8 @@ if __name__ == "__main__":
     search_data = make_data() # 검색할 수산물 리스트
 
     for k in range(len(search_data)) :
+        
+        ###### 식당 링크 수집 ######
         driver = webdriver.Chrome()
         url = 'https://www.diningcode.com/list.php?query=%EC%84%9C%EC%9A%B8%20'+urllib.parse.quote_plus(search_data[k])
         driver.get(url)
@@ -49,15 +53,19 @@ if __name__ == "__main__":
             if "/profile.php?rid=" in temp:
                 result.append(temp)
         print('식당 링크 수집완료..')
-
         driver.close()
 
-        total_data = []
+        wb = openpyxl.Workbook()
+        sheet = wb.active
+        now_row = 1
 
+        ###### 각 식당마다 관련 정보 수집 ######
         for i in range(len(result)) :
+            driver = webdriver.Chrome()
             temp_url = result[i]
             html = urllib.request.urlopen(temp_url).read()
             soup = BeautifulSoup(html, 'html.parser')
+            total_data = []
             temp = []
 
             print(str(i + 1)+'번째 수집중..')
@@ -81,8 +89,8 @@ if __name__ == "__main__":
             title = str(soup.select('#lbl_star_point > .point')) #평점
             score = re.sub('[^.0-9]', '', title).lstrip()
             temp.append(score)
-            
-            driver = webdriver.Chrome()
+
+            ###### 사용자가 작성한 리뷰 수집 ######
             driver.get(temp_url)
             temp_elem = driver.find_element_by_tag_name("body")
 
@@ -91,7 +99,7 @@ if __name__ == "__main__":
                 time.sleep(0.1)
                 try:
                     driver.find_element_by_xpath('//*[@id="div_more_review"]/span').click()  # 더보기 버튼 클릭
-                    elem.send_keys(Keys.PAGE_DOWN)
+                    temp_elem.send_keys(Keys.PAGE_DOWN)
                     time.sleep(0.1)
                 except:
                     pass
@@ -101,7 +109,7 @@ if __name__ == "__main__":
             for j in range(len(review_cnt)):
                 date = review_cnt[j].find_element_by_css_selector('.date')
 
-                if ('2020' or '2021') in date.text:
+                if ('2019' or '2020' or '2021') in date.text:
                     try:
                         temp2 = temp.copy()
                         temp2.append(review_cnt[j].find_element_by_css_selector('.review_contents.btxt').text) # 작성 리뷰
@@ -110,11 +118,13 @@ if __name__ == "__main__":
                         total_data.append(temp2)
                     except:
                         pass
-                    
             driver.close()
-
-        with open(search_data[k]+'.csv', 'w', encoding='utf-8-sig', newline='') as f:
-            csvWriter = csv.writer(f)
-
-            for i in total_data:
-                csvWriter.writerow(i)
+            
+            ###### 한 식당에 대한 정보 및 리뷰를 csv 파일로 저장 ######
+            for j in range(len(total_data)):
+                for l in range(len(total_data[j])):
+                    sheet.cell(row = now_row + j,column = l+1).value = total_data[j][l]
+            wb.save(search_data[k]+'.csv')
+            
+            ###### csv파일에서 다음 행에 쓰기 위한 작업 ######
+            now_row += len(total_data)
