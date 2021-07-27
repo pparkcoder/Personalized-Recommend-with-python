@@ -120,16 +120,18 @@ if __name__ == "__main__":
     
                 for j in range(len(review_cnt)):
                     date = review_cnt[j].find_element_by_css_selector('.date')
-    
-                    if (date.text not in '년') or (date.text in ('2019' or '2020' or '2021')):
+                    temp_date = date.text
+                    
+                    if ('년' not in temp_date) or ('2019년' in temp_date) or ('2020년' in temp_date): # 2019 ~ 2021년까지의 리뷰
                         try:
                             temp2 = temp.copy()
-                            temp2.append(review_cnt[j].find_element_by_css_selector('.review_contents.btxt').text)  # 작성 리뷰
-                            temp2.append((review_cnt[j].find_element_by_css_selector('.point-detail').text)[1])  # 리뷰 평점
-                            temp2.append(date.text)
+                            temp2.append(review_cnt[j].find_element_by_css_selector('.review_contents.btxt').text) # 작성 리뷰
+                            temp2.append((review_cnt[j].find_element_by_css_selector('.point-detail').text)[1]) # 리뷰 평점
+                            temp2.append(temp_date)
                             total_data.append(temp2)
                         except:
                             pass
+                        
                 driver.close()
     
                 ###### 한 식당에 대한 정보 및 리뷰를 csv 파일로 저장 ######
