@@ -121,7 +121,7 @@ if __name__ == "__main__":
                 for j in range(len(review_cnt)):
                     date = review_cnt[j].find_element_by_css_selector('.date')
     
-                    if ('2019' or '2020' or '2021') in date.text:
+                    if (date.text not in '년') or (date.text in ('2019' or '2020' or '2021')):
                         try:
                             temp2 = temp.copy()
                             temp2.append(review_cnt[j].find_element_by_css_selector('.review_contents.btxt').text)  # 작성 리뷰
