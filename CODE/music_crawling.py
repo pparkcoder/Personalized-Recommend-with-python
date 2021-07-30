@@ -24,25 +24,25 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
         #곡이 하나인 경우
         if len(id) == 1 :
             
-                # href에 있는 id 추출
-                temp = id[0]['href']
-                temp2 = temp.split(",")
-                temp3 = re.sub('[^0-9]', '', temp2[-1])
-                song_id = temp3[:int(len(temp3) / 2)]
-                next_url = 'https://www.melon.com/song/detail.htm?songId=' + song_id
+            # href에 있는 id 추출
+            temp = id[0]['href']
+            temp2 = temp.split(",")
+            temp3 = re.sub('[^0-9]', '', temp2[-1])
+            song_id = temp3[:int(len(temp3) / 2)]
+            next_url = 'https://www.melon.com/song/detail.htm?songId=' + song_id
                
-                # 가사 크롤링
-                req2 = urllib.request.Request(next_url, headers=headers)
-                html2 = urllib.request.urlopen(req2).read()
-                soup2 = BeautifulSoup(html2, 'html.parser')
+            # 가사 크롤링
+            req2 = urllib.request.Request(next_url, headers=headers)
+            html2 = urllib.request.urlopen(req2).read()
+            soup2 = BeautifulSoup(html2, 'html.parser')
 
-                try : # 가사가 있는 경우
-                    #print(i[0])
-                    songsong = soup2.select_one('.lyric')
-                    print(songsong.text.rstrip().lstrip())
-                    
-                except : # 가사가 없는 경우
-                    pass
+            try : # 가사가 있는 경우
+                songsong = soup2.select_one('.lyric')
+                print(songsong.text.rstrip().lstrip())
+                
+            except : # 가사가 없는 경우
+                pass
+            
  
         #곡이 여러개인 경우
         elif len(id) > 1:
