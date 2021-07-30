@@ -17,12 +17,13 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
         url = 'https://www.melon.com/search/song/index.htm?q='+urllib.parse.quote_plus(search)+'&section=&searchGnbYn=Y&kkoSpl=Y&kkoDpType=&linkOrText=T&ipath=srch_form'
         req = urllib.request.Request(url, headers=headers)
         html = urllib.request.urlopen(req).read()
-        #soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, 'html.parser')
 
         id = soup.select('.btn.btn_icon_detail')
         
         #곡이 하나인 경우
         if len(id) == 1 :
+            
                 # href에 있는 id 추출
                 temp = id[0]['href']
                 temp2 = temp.split(",")
@@ -39,9 +40,11 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
                     #print(i[0])
                     songsong = soup2.select_one('.lyric')
                     print(songsong.text.rstrip().lstrip())
+                    
                 except : # 가사가 없는 경우
                     pass
  
+        #곡이 여러개인 경우
         elif len(id) > 1:
             temp = id[0]['href']
             temp2 = temp.split(",")
@@ -53,9 +56,11 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
                 req2 = urllib.request.Request(next_url, headers=headers)
                 html2 = urllib.request.urlopen(req2).read()
                 soup2 = BeautifulSoup(html2, 'html.parser')
+                
+                # 차례대로 사이트 방문 하여 곡 명 확인
                 song_name = soup2.select_one('.downloadfrm > .song_name')
                 
-                if song_name.text == i[0] :
+                if song_name.text == i[0] : # 곡 명과 찾으려는 곡 명이 같은 경우
 
                     try:  # 가사가 있는 경우
                         print(i[0])
