@@ -61,12 +61,16 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
                 temp_artist = artist[j].text
                 temp_album = re.sub('[\{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', album[j].text)
 
+                search_song = i[0].lower()
+                search_artist = re.sub(r"\s+", "", i[1])
+                search_album = re.sub('[ \{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', i[4].lower())
+
                 ## Inst, MR version 은 건너뛰기 ##
                 if ('inst' in str(temp_song).lower()) or ('mr' in str(temp_song).lower()):
                     continue
 
                 ## 곡명, 가수명, 앨범명이 모두 일치한 경우 ##
-                if (i[0].lower() in str(temp_song).lower()) and (i[1] in temp_artist) and (re.sub('[\{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '',i[4].lower()) in str(temp_album).lower()):
+                if (search_song in str(temp_song).lower()) and (search_artist in re.sub(r"\s+", "", temp_artist)) and (search_album in str(temp_album).lower()):
                     flag = 1  # 동일 곡이 있는 경우
                     driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
                     time.sleep(1)
@@ -82,12 +86,16 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
                     temp_song = song[j].text
                     temp_artist = artist[j].text
 
+                    search_song = i[0].lower()
+                    search_artist = re.sub(r"\s+", "", i[1])
+                    search_album = re.sub('[ \{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', i[4].lower())
+
                     ## Inst, MR version 은 건너뛰기 ##
                     if ('inst' in str(temp_song).lower()) or ('mr' in str(temp_song).lower()):
                         continue
 
                     ## 곡명, 가수명이 모두 일치한 경우 ##
-                    if (i[0].lower() in str(temp_song).lower()) and (i[1] in temp_artist):
+                    if (search_song in str(temp_song).lower()) and (search_artist in re.sub(r"\s+", "", temp_artist)):
                         flag = 1  # 동일 곡이 있는 경우
                         driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
                         time.sleep(1)
