@@ -74,7 +74,6 @@ with open('sample2.csv','r',encoding='utf-8-sig') as f:
                     break
         if flag == 0 :
             lyric_data.append('동일 곡 없음')
-        print(lyric_data)
         driver.close()
 
 with open('sample2가사.csv', 'w', encoding='utf-8-sig', newline='') as f:
