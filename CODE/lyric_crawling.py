@@ -11,10 +11,11 @@ from selenium import webdriver
 
 # 0:곡제목, 1:가수, 2:장르, 3:발매일, 4:앨범명
 lyric_data = []
-with open('sample.csv','r',encoding='utf-8-sig') as f:
+with open('tempsong.csv','r',encoding='utf-8-sig') as f:
     data = csv.reader(f)
-    num = 1
+    check_num = num = 1
     for i in data:
+        
         ##header setting##
         try:
             subprocess.Popen(
@@ -52,67 +53,101 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
         song = driver.find_elements_by_css_selector('.song')
         artist = driver.find_elements_by_css_selector('.artist')
         album = driver.find_elements_by_css_selector('.album')
+        min_len = min(len(artist),len(album))
         flag = 0
 
         ## 1. 곡명, 가수명, 앨범명이 일치한 경우 / 2. 곡명, 가수명이 일치한 경우 순서로 찾음##
-        if len(artist) > 0 :
-            for j in range(1,len(artist)):
-                temp_song = song[j].text
-                temp_artist = artist[j].text
-                temp_album = re.sub('[\{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', album[j].text)
+        if min_len > 0 :
+            for j in range(1,min_len):
+                driver.implicitly_wait(5)
+                temp_song = (song[j].text).lower()
+                temp_artist = re.sub(r"\s+", "", artist[j].text)
+                temp_album = re.sub('[\{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', album[j].text).lower()
+                temp2_album = re.sub(r"\s+", "", temp_album)
 
                 search_song = i[0].lower()
                 search_artist = re.sub(r"\s+", "", i[1])
                 search_album = re.sub('[ \{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', i[4].lower())
+                search2_album = re.sub(r"\s+", "", search_album)
 
-                ## Inst, MR version 은 건너뛰기 ##
-                if ('inst' in str(temp_song).lower()) or ('mr' in str(temp_song).lower()):
+                input_check = driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div[1]/div/table/tbody/tr[' + str(j) + ']').get_attribute('class')
+
+                ## 선택 못하는것, Inst, MR version 은 건너뛰기 ##
+                if ('no' in input_check) or ('inst' in str(temp_song).lower()) or ('mr' in str(temp_song).lower()):
                     continue
 
                 ## 곡명, 가수명, 앨범명이 모두 일치한 경우 ##
-                if (search_song in str(temp_song).lower()) and (search_artist in re.sub(r"\s+", "", temp_artist)) and (search_album in str(temp_album).lower()):
-                    flag = 1  # 동일 곡이 있는 경우
-                    driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
-                    time.sleep(1)
-                    try: # 가사가 있는 경우
-                        lyric = driver.find_element_by_css_selector('.lyrics.hide')
-                        lyric_data.append(lyric.text)
-                    except: # 가사가 없는 경우
-                        lyric_data.append('가사 없음')
-                    break
+                if (search_song in temp_song) and (search_artist in temp_artist) and (search2_album in temp2_album):
+                    try :
+                        driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div[1]/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
+                        driver.implicitly_wait(10)
+                        flag = 1  # 동일 곡이 있는 경우
+                        try: # 가사가 있는 경우
+                            try :
+                                lyric = driver.find_element_by_css_selector('.lyrics.hide')
+                                lyric_data.append(lyric.text)
+                                break
+                            except :
+                                lyric = driver.find_element_by_css_selector('.lyrics')
+                                lyric_data.append(lyric.text)
+                                break
+                        except: # 가사가 없는 경우
+                            lyric_data.append('가사 없음')
+                            break
+                    except:
+                        break
 
             if flag == 0 :
-                for j in range(1,len(artist)):
-                    temp_song = song[j].text
-                    temp_artist = artist[j].text
 
-                    search_song = i[0].lower()
+                for j in range(1,min_len):
+                    driver.implicitly_wait(5)
+                    song = driver.find_elements_by_css_selector('.song')
+                    artist = driver.find_elements_by_css_selector('.artist')
+                    album = driver.find_elements_by_css_selector('.album')
+
+                    temp_song = re.sub(r"\s+", "", (song[j].text).lower())
+                    temp_artist = re.sub(r"\s+", "", artist[j].text)
+
+                    search_song = re.sub(r"\s+", "", i[0].lower())
                     search_artist = re.sub(r"\s+", "", i[1])
-                    search_album = re.sub('[ \{\}\[\]\/?.`!^\-_+<>@\#$%&\\\=\'\"\♥\♡\ㅋ\ㅠ\ㅜ\ㄱ\ㅎ\ㄲ\ㅡ]', '', i[4].lower())
 
-                    ## Inst, MR version 은 건너뛰기 ##
-                    if ('inst' in str(temp_song).lower()) or ('mr' in str(temp_song).lower()):
+                    input_check = driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div[1]/div/table/tbody/tr[' + str(j) + ']').get_attribute('class')
+
+                    ## 선택 못하는것, Inst, MR version 은 건너뛰기 ##
+                    if ('no' in input_check) or ('inst' in temp_song) or ('mr' in temp_song):
                         continue
 
                     ## 곡명, 가수명이 모두 일치한 경우 ##
-                    if (search_song in str(temp_song).lower()) and (search_artist in re.sub(r"\s+", "", temp_artist)):
-                        flag = 1  # 동일 곡이 있는 경우
-                        driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
-                        time.sleep(1)
-                        try: # 가사가 있는 경우
-                            lyric = driver.find_element_by_css_selector('.lyrics.hide')
-                            lyric_data.append(lyric.text)
-                        except: # 가사가 없는 경우
-                            lyric_data.append('가사 없음')
-                        break
+                    if (search_song in temp_song) and (search_artist in temp_artist):
+                        try :
+                            driver.find_element_by_xpath('//*[@id="content"]/div/div[3]/div[1]/div/table/tbody/tr[' + str(j) + ']/td[3]/div[1]/span/a').click()
+                            driver.implicitly_wait(10)
+                            try: # 가사가 있는 경우
+                                try :
+                                    flag = 1  # 동일 곡이 있는 경우
+                                    lyric = driver.find_element_by_css_selector('.lyrics.hide')
+                                    lyric_data.append(lyric.text)
+                                    break
+                                except :
+                                    flag = 1  # 동일 곡이 있는 경우
+                                    lyric = driver.find_element_by_css_selector('.lyrics')
+                                    lyric_data.append(lyric.text)
+                                    break
+                            except: # 가사가 없는 경우
+                                driver.back()
+                                continue
+                        except :
+                            continue
         if flag == 0 :
             lyric_data.append('곡 없음')
+            
+        ## 엑셀 저장 ##
+        if (num > 0) and (num % 500 == 0) :
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+            for j in range(len(lyric_data)):
+                sheet.cell(row=j + 1, column=1).value = lyric_data[j]
+            wb.save('최종본가사'+str(check_num)+'.csv')
+            check_num += 1
         num += 1
         driver.close()
-
-## 엑셀 저장 ##
-wb = openpyxl.Workbook()
-sheet = wb.active
-for i in range(len(lyric_data)):
-    sheet.cell(row = i+1,column=1).value = lyric_data[i]
-wb.save('sample가사.csv')
