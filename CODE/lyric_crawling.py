@@ -153,7 +153,7 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
             sheet = wb.active
             for j in range(len(lyric_data)):
                 sheet.cell(row=j + 1, column=1).value = lyric_data[j]
-            wb.save('장훈가사'+str(check_num)+'.csv')
+            wb.save('sample가사'+str(check_num)+'.csv')
             check_num += 1
             lyric_data = []
         print(len(lyric_data))
@@ -165,4 +165,4 @@ wb = openpyxl.Workbook()
 sheet = wb.active
 for j in range(len(lyric_data)):
      sheet.cell(row=j + 1, column=1).value = lyric_data[j]
-wb.save('장훈가사'+str(check_num)+'.csv')
+wb.save('sample가사'+str(check_num)+'.csv')
