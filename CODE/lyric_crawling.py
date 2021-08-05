@@ -8,11 +8,10 @@ import chromedriver_autoinstaller
 import subprocess
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 # 0:곡제목, 1:가수, 2:장르, 3:발매일, 4:앨범명
 lyric_data = []
-with open('tempsong.csv','r',encoding='utf-8-sig') as f:
+with open('sample.csv','r',encoding='utf-8-sig') as f:
     data = csv.reader(f)
     check_num = num = 1
 
@@ -54,10 +53,13 @@ with open('tempsong.csv','r',encoding='utf-8-sig') as f:
         song = driver.find_elements_by_css_selector('.song')
         artist = driver.find_elements_by_css_selector('.artist')
         album = driver.find_elements_by_css_selector('.album')
-        min_len = min(len(artist),len(album))
+        min_len = min(len(song),min(len(artist),len(album)))
         flag = 0 # 0 : 곡이 없는 경우, -1 : 가사가 없는 경우
-        
         ## 1. 곡명, 가수명, 앨범명이 일치한 경우 / 2. 곡명, 가수명이 일치한 경우 순서로 찾음##
+        if 'Inst' in search :
+            min_len = 0
+            flag = -1
+
         if min_len > 0 :
             for j in range(1,min_len):
                 driver.implicitly_wait(10)
@@ -141,17 +143,26 @@ with open('tempsong.csv','r',encoding='utf-8-sig') as f:
                             continue
         if flag == 0 :
             lyric_data.append('곡 없음')
-            
+
         if flag == -1 :
             lyric_data.append('가사 없음')
-            
-        if (num > 0) and (num % 500 == 0) :
+        
+        ## 100개 마다 엑셀 저장 ## 
+        if (num > 0) and (num % 100 == 0) :
             wb = openpyxl.Workbook()
             sheet = wb.active
             for j in range(len(lyric_data)):
                 sheet.cell(row=j + 1, column=1).value = lyric_data[j]
-            wb.save('최종본가사'+str(check_num)+'.csv')
+            wb.save('장훈가사'+str(check_num)+'.csv')
             check_num += 1
             lyric_data = []
+        print(len(lyric_data))
         num += 1
         driver.close()
+
+## 마지막 25개 저장 ##
+wb = openpyxl.Workbook()
+sheet = wb.active
+for j in range(len(lyric_data)):
+     sheet.cell(row=j + 1, column=1).value = lyric_data[j]
+wb.save('장훈가사'+str(check_num)+'.csv')
