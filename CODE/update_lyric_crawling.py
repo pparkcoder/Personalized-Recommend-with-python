@@ -188,7 +188,7 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
 
 ## 마지막 저장 ##
 df = pd.DataFrame(lyric_data)
-if not os.path.exists('장훈가사'+str(check_num)+'.csv'):
+if not os.path.exists('sample_lyric'+str(check_num)+'.csv'):
     df.to_csv('sample_lyric'+str(check_num)+'.csv', index=False, mode='w', encoding='utf-8-sig', header=False)
 else:
     df.to_csv('sample_lyric'+str(check_num)+'.csv', index=False, mode='a', encoding='utf-8-sig', header=False)
