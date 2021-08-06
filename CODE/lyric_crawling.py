@@ -11,9 +11,10 @@ from selenium import webdriver
 
 # 0:곡제목, 1:가수, 2:장르, 3:발매일, 4:앨범명
 lyric_data = []
-with open('sample.csv','r',encoding='utf-8-sig') as f:
+with open('장훈1.csv','r',encoding='utf-8-sig') as f:
     data = csv.reader(f)
-    check_num = num = 1
+    num = 1
+    check_num = 1
 
     for i in data:
         ##header setting##
@@ -146,14 +147,14 @@ with open('sample.csv','r',encoding='utf-8-sig') as f:
 
         if flag == -1 :
             lyric_data.append('가사 없음')
-        
-        ## 100개 마다 엑셀 저장 ## 
+
+        ## 100개 마다 엑셀 저장 ##
         if (num > 0) and (num % 100 == 0) :
             wb = openpyxl.Workbook()
             sheet = wb.active
             for j in range(len(lyric_data)):
                 sheet.cell(row=j + 1, column=1).value = lyric_data[j]
-            wb.save('sample가사'+str(check_num)+'.csv')
+            wb.save('장훈가사'+str(check_num)+'.csv')
             check_num += 1
             lyric_data = []
         print(len(lyric_data))
@@ -165,4 +166,4 @@ wb = openpyxl.Workbook()
 sheet = wb.active
 for j in range(len(lyric_data)):
      sheet.cell(row=j + 1, column=1).value = lyric_data[j]
-wb.save('sample가사'+str(check_num)+'.csv')
+wb.save('장훈가사'+str(check_num)+'.csv')
