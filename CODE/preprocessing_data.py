@@ -13,8 +13,8 @@ with open('test.csv','r',encoding='utf-8-sig') as f:
             temp.append(i[j])
             
         date = i[3]
-        year = date[:4]
-        month = date[4:6]
+        
+        year = date[:4]        
         if year < '1990':
             temp_data = '1990년대 이전'
         elif '1990' <= year and year < '2000':
@@ -24,7 +24,8 @@ with open('test.csv','r',encoding='utf-8-sig') as f:
         elif '2010' <= year:
             temp_data = '2010년 이후'
         temp.append(temp_data)
-
+        
+        month = date[4:6]
         if '03' <= month and month <= '05':
             temp_data = '봄'
         elif '06' <= month and month <= '08':
@@ -33,7 +34,8 @@ with open('test.csv','r',encoding='utf-8-sig') as f:
             temp_data = '가을'
         else:
             temp_data = '겨울'
-            
+        temp.append(temp_data)
+        
         result.append(temp)
 
 with open('test_가사.csv', 'w', encoding='utf-8-sig', newline='') as f:
