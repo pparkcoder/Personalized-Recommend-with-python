@@ -44,4 +44,6 @@
 
 ### 실행 결과
 
-![스샷3](C:\Users\ILIFO-104\Desktop\챗봇\스샷3.JPG) 
+![스샷3](https://user-images.githubusercontent.com/84856055/135490036-12899dd8-41e6-4cba-807a-d37c49107b41.JPG) 
+
+ 
