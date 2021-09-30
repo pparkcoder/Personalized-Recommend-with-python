@@ -25,10 +25,10 @@ while True :
 
     data = mySocket.recv(2048).decode()
     ret_data = json.loads(data)
-    print("\n추천곡 리스트\n")
+    print()
     print(ret_data)
+    print()
     # for i in range(len(ret_data)) :
     #     print(ret_data[i]['가수'],ret_data[i]['제목'],ret_data[i]['장르'],ret_data[i]['계절'])
 
 mySocket.close()
-
